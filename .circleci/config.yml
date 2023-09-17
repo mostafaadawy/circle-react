@@ -1,0 +1,30 @@
+version: 2.1
+
+jobs:
+  deploy:
+    docker:
+      - image: cimg/node:16.10
+    steps:
+      - checkout
+      - restore_cache:
+          keys:
+            - v1-dependencies-{{checksum "package.json"}}
+            - v1-dependencies-
+      - run:
+          name: Install Dependencies
+          command: npm install
+      - save_cache:
+          paths:
+            - node_modeules
+          key: v1-dependencies-{{checksum "package.json"}}
+      - run:
+          name: Run Tests
+          command: npm run test
+      - run:
+          name: BUild
+          command: npm run build
+
+workflows:
+  build_deploy:
+    jobs:
+      - deploy
